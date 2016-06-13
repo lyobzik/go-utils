@@ -19,8 +19,8 @@ import (
 )
 
 type Stopper struct {
-	waitDone   sync.WaitGroup
-	Stopping   chan struct{}
+	waitDone sync.WaitGroup
+	Stopping chan struct{}
 }
 
 func NewStopper() *Stopper {
@@ -45,4 +45,3 @@ func (s *Stopper) Add() {
 func (s *Stopper) Done() {
 	s.waitDone.Done()
 }
-
