@@ -15,34 +15,25 @@
 package utils
 
 import (
-	"io/ioutil"
-	"os"
+	"io"
+	"log"
 
+	"github.com/op/go-logging"
 	"github.com/pkg/errors"
 )
 
-func EnsureDir(path string) error {
-	return os.MkdirAll(path, os.ModeDir|0777)
+func IsEndOfFileError(err error) bool {
+	return errors.Cause(err) == io.EOF
 }
 
-func EnsureDirs(paths ...string) error {
-	for _, path := range paths {
-		if err := EnsureDir(path); err != nil {
-			return errors.Wrapf(err, "cannot create directory '%s'", path)
-		}
-	}
-	return nil
-}
-
-func GetFiles(path string) ([]string, error) {
-	files, err := ioutil.ReadDir(path)
+func HandleErrorWithoutLogger(message string, err error) {
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot read file list in '%s'", path)
+		log.Fatalf("%s: %v\n", message, err)
 	}
+}
 
-	fileNames := make([]string, 0)
-	for _, file := range files {
-		fileNames = append(fileNames, file.Name())
+func HandleError(logger *logging.Logger, message string, err error) {
+	if err != nil {
+		logger.Fatalf("%s: %v\n", message, err)
 	}
-	return fileNames, nil
 }
