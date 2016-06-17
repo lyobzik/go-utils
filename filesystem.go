@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
+	"regexp"
 )
 
 func EnsureDir(path string) error {
@@ -45,4 +46,22 @@ func GetFiles(path string) ([]string, error) {
 		fileNames = append(fileNames, file.Name())
 	}
 	return fileNames, nil
+}
+
+func GetFilteredFiles(path string, filter string) ([]string, error) {
+	files, err := GetFiles(path)
+	if err != nil {
+		return nil, err
+	}
+	filterRegexp, err := regexp.Compile(filter)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot compile filter regexp '%s'", filter)
+	}
+	filteredFiles := make([]string, 0, len(files))
+	for _, file := range files {
+		if filterRegexp.MatchString(file) {
+			filteredFiles = append(filteredFiles, file)
+		}
+	}
+	return filteredFiles, nil
 }
