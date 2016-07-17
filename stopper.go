@@ -45,3 +45,8 @@ func (s *Stopper) Add() {
 func (s *Stopper) Done() {
 	s.waitDone.Done()
 }
+
+func (s *Stopper) Join() {
+	s.Stop()
+	s.WaitDone()
+}
