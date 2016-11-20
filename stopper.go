@@ -16,22 +16,27 @@ package utils
 
 import (
 	"sync"
+	"sync/atomic"
 )
 
 type Stopper struct {
+	closed   int32
 	waitDone sync.WaitGroup
 	Stopping chan struct{}
 }
 
 func NewStopper() *Stopper {
 	return &Stopper{
+		closed:   0,
 		waitDone: sync.WaitGroup{},
 		Stopping: make(chan struct{}, 1),
 	}
 }
 
 func (s *Stopper) Stop() {
-	close(s.Stopping)
+	if atomic.CompareAndSwapInt32(&s.closed, 0, 1) {
+		close(s.Stopping)
+	}
 }
 
 func (s *Stopper) WaitDone() {
